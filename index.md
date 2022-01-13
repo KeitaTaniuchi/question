@@ -1,18 +1,19 @@
-#タイトル
+# タイトル
 BootstrapVue適用時のコンポーネント間の双方向データバインディングについて
 
 
-#実行環境
+# 実行環境
 Vue.js : 2.6.14
 VueCLI : 4.5.15
 BootstrapVue : 2.1.0
 
 
-#期待する動作
+# 期待する動作
 BootstrapVueで作成したラジオボタンのどちらかを選択した場合に、次のラジオボタンが出現するようにしたい
 
 
-#エラー内容
+# エラー内容
+```
 "TypeError: Cannot read properties of undefined (reading 'value')" vue.runtime.esm.js?2b0e:619 [Vue warn]: Error in v-on handler: 
 found in
 ---> <BFormRadioGroup>
@@ -33,138 +34,30 @@ TypeError: Cannot read properties of undefined (reading 'value') vue.runtime.esm
     at Watcher.run (vue.runtime.esm.js?2b0e:4584)
     at flushSchedulerQueue (vue.runtime.esm.js?2b0e:4326)
     at Array.eval (vue.runtime.esm.js?2b0e:1989)
+```
 
 
-#発生している問題
+# 発生している問題
 BootstrapVueで作成したラジオボタンのどちらかを選択した場合に、次のラジオボタンが出現するようにしたいのですが、上記のようなエラーが発生してしまいます。
 BootstrapVue適用前に作成したラジオボタンではうまく動作したため、同じ記述(propsと$emit関係)をしましたが、うまく動作しません。
 
 
-#試した/調べたこと
-##試したこと
-*/views/Step2.vueに記述した「v-model」を、「v-bind:カスタム属性」と「v-on:カスタムイベント」に分けて実行
+# 試した/調べたこと
+## 試したこと
+* /views/Step2.vueに記述した「v-model」を、「v-bind:カスタム属性」と「v-on:カスタムイベント」に分けて実行
  ⇨同じエラーが発生
 
-##調べたこと
-*公式ドキュメント
+## 調べたこと
+* 公式ドキュメント
  BootstrapVueで作成したラジオボタンをバインディングする際に特殊な記述が必要ではないかどうか
 
-*コンポーネント間の双方向データバインディングについて
+* コンポーネント間の双方向データバインディングについて
 
 
-#該当のソースコード
-##うまくいっているコード
-###/components/RadioBtn.vue
-<template>
-    <fieldset>
-      <template v-for="(option, index) in options">
-        <label :key="index" class="mx-2" >
-          <input
-            class="mx-1"
-            type="radio"
-            :value="option.value"
-            :name="name"
-            @change="updateValue"
-          />{{ option.label }}
-        </label>
-      </template>
-    </fieldset>
-  </template>
-   
-  <script>
-  export default {
-    props: {
-      options: { type: Array, required: true },
-      name: { type: String, required: true },
-    },
-    methods: {
-      updateValue: function (event) {
-        this.$emit("input", event.target.value);
-      },
-    },
-  };
-  </script>
-
-###/views/Step2.vue
-  <template>
-    <QuestionBorder
-      :id_number="idNumber"
-      :question_detail="questionDetail"
-      :step_number="stepNumber"
-    >
-      <section>
-        <div>
-          <p class="mt-3">現在、生命保険に加入されていますか？</p>
-          <RadioBtn
-            v-model="q1CheckFlg"
-            :name="step2Q1"
-            :options="options"
-          ></RadioBtn>
-        </div>
-  
-        <div class="mt-4" v-show="q1CheckFlg">
-          <p>
-            現在、入院中ですか？
-            または,最近3ヶ月以内に医師の診察・検査の結果、入院・手術を勧められたことはありますか？
-          </p>
-          <RadioBtn
-            v-model="q2CheckFlg"
-            :name="step2Q2"
-            :options="options"
-          ></RadioBtn>
-        </div>
-  
-        <div class="mt-4" v-show="q2CheckFlg">
-          <p>
-            過去5年以内に病気や怪我で手術を受けたこと、または継続して7日以上の入院をしたことがありますか？
-          </p>
-          <RadioBtn :name="step2Q3" :options="options"></RadioBtn>
-        </div>
-  
-        <Btn label="前に戻る" href="/" @click="() => $router.push('/')" />
-        <Btn
-          label="次に進む"
-          href="/STEP3"
-          @click="() => $router.push('/STEP3')"
-        />
-      </section>
-    </QuestionBorder>
-  </template>
-  
-  <script>
-  import RadioBtn from "../components/RadioBtn.vue";
-  import QuestionBorder from "../components/QuestionBorder.vue";
-  import Btn from "../components/Btn.vue";
-  export default {
-    name: "step2",
-    components: { RadioBtn, QuestionBorder, Btn },
-    data() {
-      return {
-        idNumber: "step2",
-        questionDetail: "以下にお答えください",
-        stepNumber: "STEP2",
-        step2Q1: "step2-q1",
-        step2Q2: "step2-q2",
-        step2Q3: "step2-q3",
-        q1CheckFlg: false,
-        q2CheckFlg: false,
-        options: [
-          {
-            label: "はい",
-            value: "1",
-          },
-          {
-            label: "いいえ",
-            value: "2",
-          },
-        ],
-      };
-    },
-  };
-  </script>
-
-##エラーが発生するコード
-###/components/RadioBtn.vue
+# 該当のソースコード
+## /components/RadioBtn.vue
+### html
+```html
 <template>
     <b-form-radio-group
       class="mx-1"
@@ -174,7 +67,10 @@ BootstrapVue適用前に作成したラジオボタンではうまく動作し�
       @input="updateCheckFlg"
     ></b-form-radio-group>
   </template>
+   ```
   
+  ### JavaScript
+  ```JavaScript
   <script>
   export default {
     props: {
@@ -187,8 +83,12 @@ BootstrapVue適用前に作成したラジオボタンではうまく動作し�
     },
   };
   </script>
+```
+ 
 
-###/views/Step2.vue
+## /views/Step2.vue
+### html
+```html
 <template>
     <div>
       <QuestionContainer
@@ -225,7 +125,10 @@ BootstrapVue適用前に作成したラジオボタンではうまく動作し�
       </div>
     </div>
   </template>
+  ```
   
+  ### JavaScript
+  ```JavaScript
   <script>
   import BackToPrevBtn from "../components/BackToPrevBtn.vue";
   import GoNextBtn from "../components/GoNextBtn.vue";
@@ -254,3 +157,4 @@ BootstrapVue適用前に作成したラジオボタンではうまく動作し�
     },
   };
   </script>
+```
